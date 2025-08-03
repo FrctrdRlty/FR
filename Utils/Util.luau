@@ -88,7 +88,18 @@ return function(FR: any): any
     end
 
     Util.LoadInstance = function(self, sAsset: string): any?
+        warn(FR.Dir.."/Assets/"..sAsset)
         return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomInstance(sAsset)
+    end
+
+    Util.ListAssets = function(self, sPath: string): {string}
+        local assets = {}
+        for i, v in next, Preloaded do
+            if i:sub(1, #sPath) == sPath then
+                assets[#assets + 1] = v
+            end
+        end
+        return assets
     end
 
     Util.Caption = function(self, sText: string, iDuration: number?, textColor: Color3?): TextLabel
@@ -436,4 +447,3 @@ return function(FR: any): any
 
     return Util, mainFolder
 end
-
