@@ -39,17 +39,56 @@ return function(FR: any): any
         }
     }
 
+    -- Preload assets
+    local Preloaded = {}
+    do
+        local s, r = pcall(function()
+            return HttpService:JSONDecode(request({
+                Url = ("https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1"):format(FR.Owner, FR.Repo, FR.Branch),
+                Method = "GET"
+            }).Body)
+        end)
+        if s and r then
+            local i = 0
+            for _, v in next, r.tree do
+                task.spawn(function()
+                    if v.type == "blob" then
+                        i += 1
+                        local p = v.path
+                        local sp = p:split("/")
+                        local ext = "."..sp[#sp]:split(".")[2]
+                        local fp = ("https://raw.githubusercontent.com/%s/%s/%s/%s"):format(FR.Owner, FR.Repo, FR.Branch, v.path)
+                        if ext == ".rbxm" or (ext ~= ".json" and ext ~= ".luau") then
+                            local t = Preloaded
+                            for idx = 2, #sp - 1 do
+                                local dir = sp[idx]
+                                t[dir] = t[dir] or {}
+                                t = t[dir]
+                            end
+                            local name = sp[#sp]:split(".")[1]
+                            t[name] = (ext == ".rbxm" and LoadCustomInstance or LoadCustomAsset)(fp)
+                        end
+                        i -= 1
+                    end
+                end)
+            end
+            repeat task.wait() until i <= 0
+        end
+    end
+
+    Util.Preloaded = Preloaded
+
     Util.Connections.CharacterAdded = localPlayer.CharacterAdded:Connect(function(character: Model)
         localCharacter = character
         localRoot = character:WaitForChild("HumanoidRootPart")
     end)
 
     Util.LoadAsset = function(self, sAsset: string): any?
-        return LoadCustomAsset(`{FR.Assets}/{sAsset}`)
+        return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomAsset(sAsset)
     end
 
     Util.LoadInstance = function(self, sAsset: string): any?
-        return LoadCustomInstance(`{FR.Assets}/{sAsset}`)
+        return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomInstance(sAsset)
     end
 
     Util.Caption = function(self, sText: string, iDuration: number?, textColor: Color3?): TextLabel
@@ -112,7 +151,7 @@ return function(FR: any): any
             if pRoom:sub(-5) ~= ".rbxm" then
                 pRoom ..= ".rbxm"
             end
-            room = self:LoadInstance("/Rooms/"..pRoom)
+            room = self:LoadInstance("Rooms/"..pRoom)
         end
         if not room then
             error("Failed to load room: "..tostring(pRoom))
