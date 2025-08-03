@@ -79,7 +79,7 @@ return function(FR: any): any
     end)
 
     Util.LoadAsset = function(self, sAsset: string): any?
-        return Preloaded[FR.Dir.."/Assets/"..sAsset]:Clone()
+        return Preloaded[FR.Dir.."/Assets/"..sAsset]
     end
 
     Util.LoadInstance = function(self, sAsset: string): any?
