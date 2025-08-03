@@ -326,7 +326,7 @@ return function(FR: any): any
 
         localCharacter:PivotTo(CFrame.new(0, -1000, 0))
 
-        local baseMotors = HttpService:JSONDecode(readfile(FR.Parent.."/BaseMotors.json"))
+        local baseMotors = HttpService:JSONDecode(readfile(FR.Root.."/BaseMotors.json"))
         for i, v in next, fakeCharacter:GetDescendants() do
             if v:IsA("Motor6D") then
                 local data = baseMotors[v.Name]
@@ -396,4 +396,5 @@ return function(FR: any): any
     })
 
     return Util, mainFolder
+
 end
