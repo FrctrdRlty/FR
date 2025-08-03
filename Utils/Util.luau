@@ -90,7 +90,7 @@ return function(FR: any): any
         local assets = {}
         for i, v in next, Preloaded do
             if i:sub(1, #sPath) == sPath then
-                assets[#assets + 1] = v
+                assets[#assets + 1] = v:Clone()
             end
         end
         return assets
