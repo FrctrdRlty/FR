@@ -54,19 +54,14 @@ return function(FR: any): any
                 task.spawn(function()
                     if v.type == "blob" then
                         i += 1
-                        local p = v.path
-                        local sp = p:split("/")
-                        local ext = "."..sp[#sp]:split(".")[2]
-                        local fp = ("https://raw.githubusercontent.com/%s/%s/%s/%s"):format(FR.Owner, FR.Repo, FR.Branch, v.path)
-                        if ext == ".rbxm" or (ext ~= ".json" and ext ~= ".luau") then
-                            local t = Preloaded
-                            for idx = 2, #sp - 1 do
-                                local dir = sp[idx]
-                                t[dir] = t[dir] or {}
-                                t = t[dir]
-                            end
-                            local name = sp[#sp]:split(".")[1]
-                            t[name] = (ext == ".rbxm" and LoadCustomInstance or LoadCustomAsset)(fp)
+                        local path = v.path
+                        local split = path:split("/")
+                        local extension = "."..split[#split]:split(".")[2]
+                        local filePath = ("https://raw.githubusercontent.com/%s/%s/%s/%s"):format(FR.Owner, FR.Repo, FR.Branch, v.path)
+                        if extension == ".rbxm" then
+                            Preloaded[path] = LoadCustomInstance(filePath)
+                        elseif extension ~= ".json" and extension ~= ".luau" then
+                            Preloaded[path] = LoadCustomAsset(filePath)
                         end
                         i -= 1
                     end
@@ -88,7 +83,6 @@ return function(FR: any): any
     end
 
     Util.LoadInstance = function(self, sAsset: string): any?
-        warn(FR.Dir.."/Assets/"..sAsset)
         return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomInstance(sAsset)
     end
 
