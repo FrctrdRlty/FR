@@ -30,7 +30,7 @@ fadeFrame.ZIndex = 99998
 fadeFrame.Parent = mainUI
 
 return function(FR: any): any
-    local Signal = Require(FR.Utils.."/Signal.luau")
+    local Signal = Require(FR.Root.."/Utils/Signal.luau")
 
     local Util = {
         Connections = {},
@@ -436,3 +436,4 @@ return function(FR: any): any
 
     return Util, mainFolder
 end
+
