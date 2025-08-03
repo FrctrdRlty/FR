@@ -326,7 +326,7 @@ return function(FR: any): any
 
         localCharacter:PivotTo(CFrame.new(0, -1000, 0))
 
-        local baseMotors = HttpService:JSONDecode(readfile(FR.Root.."/BaseMotors.json"))
+        local baseMotors = HttpService:JSONDecode(game:HttpGet(FR.Root.."/Assets/BaseMotors.json"))
         for i, v in next, fakeCharacter:GetDescendants() do
             if v:IsA("Motor6D") then
                 local data = baseMotors[v.Name]
@@ -371,7 +371,7 @@ return function(FR: any): any
     end
 
     -- Main folder setup
-    local mainFolder = Util:LoadInstance("MainFolder.rbxm")
+    local mainFolder = Util:LoadInstance(FR.Root.."/Assets/MainFolder.rbxm")
     mainFolder.Parent = workspace
     Util.MainFolder = mainFolder
 
@@ -396,5 +396,4 @@ return function(FR: any): any
     })
 
     return Util, mainFolder
-
 end
