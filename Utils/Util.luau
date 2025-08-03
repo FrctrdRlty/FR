@@ -371,7 +371,7 @@ return function(FR: any): any
     end
 
     -- Main folder setup
-    local mainFolder = Util:LoadInstance(FR.Root.."/Assets/MainFolder.rbxm")
+    local mainFolder = LoadCustomInstance(FR.Root.."/Assets/MainFolder.rbxm")
     mainFolder.Parent = workspace
     Util.MainFolder = mainFolder
 
