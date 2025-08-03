@@ -79,11 +79,11 @@ return function(FR: any): any
     end)
 
     Util.LoadAsset = function(self, sAsset: string): any?
-        return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomAsset(sAsset)
+        return Preloaded[FR.Dir.."/Assets/"..sAsset]:Clone()
     end
 
     Util.LoadInstance = function(self, sAsset: string): any?
-        return Preloaded[FR.Dir.."/Assets/"..sAsset] or LoadCustomInstance(sAsset)
+        return Preloaded[FR.Dir.."/Assets/"..sAsset]:Clone()
     end
 
     Util.ListAssets = function(self, sPath: string): {string}
