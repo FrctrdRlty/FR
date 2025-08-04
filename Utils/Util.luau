@@ -29,6 +29,39 @@ fadeFrame.BackgroundTransparency = 1
 fadeFrame.ZIndex = 99998
 fadeFrame.Parent = mainUI
 
+local gsub = string.gsub
+local sub = string.sub
+local split = string.split
+local match = string.match
+
+local function scanDir(path: string)
+    local dir = {}
+    local rootPath = split(gsub(path, "\\", "/"), "/")[1]
+    local function scan(filePath: string)
+        for _, v in next, listfiles(filePath) do
+            if isfolder(v) then
+                scan(v)
+            elseif isfile(v) then
+                local rel = sub(gsub(v, "\\", "/"), #rootPath + 2)
+                local extension = match(v, "^.+(%..+)$")
+                if extension == ".rbxm" then
+                    local inst = LoadCustomInstance(v)
+                    if inst then
+                        dir[rel] = inst
+                    end
+                elseif extension ~= ".rbxl" and extension ~= ".json" and extension ~= ".luau" then
+                    local a = LoadCustomAsset(v)
+                    if a then
+                        dir[rel] = a
+                    end
+                end
+            end
+        end
+    end
+    scan(path)
+    return dir
+end
+
 return function(FR: any): any
     local Signal = Require(FR.Root.."/Utils/Signal.luau")
 
@@ -41,7 +74,9 @@ return function(FR: any): any
 
     -- Preload assets
     local Preloaded = {}
-    do
+    if FR.LOCAL then
+        Preloaded = scanDir(FR.LocalRoot.."/"..FR.Dir)
+    else
         local s, r = pcall(function()
             return HttpService:JSONDecode(request({
                 Url = ("https://api.github.com/repos/%s/%s/git/trees/%s?recursive=1"):format(FR.Owner, FR.Repo, FR.Branch),
